@@ -131,7 +131,7 @@ func (cfg *apiConfig) handlerUploadVideo(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	vidUrl := fmt.Sprintf("%s,%s", cfg.s3Bucket, fileKeyHexString)
+	vidUrl := fmt.Sprintf("%s/%s", cfg.s3CfDistribution, fileKeyHexString)
 	video.VideoURL = &vidUrl
 
 	err = cfg.db.UpdateVideo(video)
@@ -140,13 +140,7 @@ func (cfg *apiConfig) handlerUploadVideo(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	videoWithSignedURL, err := cfg.dbVideoToSignedVideo(video)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't generate signed URL for video", err)
-		return
-	}
-
-	respondWithJSON(w, http.StatusOK, videoWithSignedURL)
+	respondWithJSON(w, http.StatusOK, video)
 }
 
 func getVideoAspectRatio(filePath string) (string, error) {
